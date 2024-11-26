@@ -22,7 +22,6 @@ export const commentAI = async (req, res) => {
         },
       ],
     });
-    console.log(completion.choices[0].message);
     const suggestedComment = completion.choices[0].message;
     res.status(200).json({ suggestedComment });
   } catch (error) {
