@@ -42,7 +42,7 @@ export const createUser = async (req, res, next) => {
   }
 };
 
-//Navbar에서 Favorite 페이지로 이동시
+//from Navbar to Favorite page
 export const getUser = async (req, res, next) => {
   try {
     const { userId } = req;
