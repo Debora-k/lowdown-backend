@@ -72,15 +72,6 @@ export const loginWithGoogle = async (req, res, next) => {
       });
     }
 
-    /*   토큰 값 가져올때 문제 발생시에 이 코드로 실행    */
-    // const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
-    // const ticket = await googleClient.verifyIdToken({
-    //   idToken: credential,
-    //   audience: GOOGLE_CLIENT_ID,
-    // });
-    // const { email, name, sub: googleId } = ticket.getPayload();
-
-    // 구글버튼으로 새로 추가된 것 - 유저 인포 가져오기
     const userInfo = await axios.get(
       'https://www.googleapis.com/oauth2/v3/userinfo',
       {
@@ -88,31 +79,26 @@ export const loginWithGoogle = async (req, res, next) => {
       }
     );
 
-    // 구글 프로필 이미지 가져오도록 추가함 - Google UserInfo 데이터
     const { email, name, sub: googleId, picture } = userInfo.data;
-    // console.log('User Info:', userInfo.data); // 실제로 받아오는 데이터 확인
 
     let user = await User.findOne({ $or: [{ email }, { googleId }] });
 
     if (!user) {
-      // 새 사용자 생성
       user = new User({
         email,
         name,
         googleId,
-        picture, // 프로필 이미지 추가
+        picture,
       });
 
       await user.save();
     } else {
-      // 기존 사용자 업데이트
       if (!user.googleId) {
-        user.googleId = googleId; // (login with email 유저이면)이미 이메일로 가입한 유저이면 googleId 연동
+        user.googleId = googleId;
       }
 
-      // 프로필 이미지가 없을 경우 업데이트
       if (!user.picture) {
-        user.picture = picture; // 기존 사용자의 프로필 이미지 업데이트
+        user.picture = picture;
       }
       await user.save();
     }
