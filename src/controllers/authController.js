@@ -125,7 +125,7 @@ export const requestPasswordReset = async (req, res) => {
       expiresIn: '24h',
     });
 
-    const forgotURL = `http://localhost:4000/forgotPassword?id=${user._id}&token=${token}`;
+    const forgotURL = `http://localhost:3000/forgotPassword?id=${user._id}&token=${token}`;
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
