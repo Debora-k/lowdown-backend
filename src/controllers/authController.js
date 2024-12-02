@@ -155,6 +155,7 @@ export const requestPasswordReset = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
+  const { id, password, token } = req.body;
   try {
     const user = await User.findOne({ _id: id });
     if (!user) {
@@ -173,6 +174,7 @@ export const resetPassword = async (req, res) => {
       .status(200)
       .json({ status: 'success', message: 'Password has been reset' });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ status: 'failed', message: 'Something went wrong' });
   }
 };
