@@ -1,6 +1,8 @@
 import Article from '../models/Article.js';
 import Comment from '../models/Comment.js';
 
+const PAGE_SIZE = 10;
+
 export const createComment = async (req, res) => {
   try {
     const { userId } = req;
@@ -63,22 +65,36 @@ export const updateComment = async (req, res) => {
 
 export const getCommentsByArticle = async (req, res) => {
   try {
-    const { articleId } = req.query;
-    const commentList = await Comment.find({ articleId })
+    const { page, articleId } = req.query;
+    const query = Comment.find({ articleId })
       .populate({
         path: 'userId',
         select: 'name picture',
       })
       .sort({ createdAt: -1 });
 
+    let totalPageNum = 0;
+
+    if (page) {
+      query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+      const totalCommentNum = await Comment.find({
+        articleId,
+      }).countDocuments();
+      totalPageNum = Math.ceil(totalCommentNum / PAGE_SIZE);
+    }
+
+    const commentList = await query.exec();
+
     const updatedCommentList = commentList.map((item) => ({
       ...item._doc,
       totalLike: item._doc.likes.length,
     }));
 
-    res
-      .status(200)
-      .json({ status: 'success', commentList: updatedCommentList });
+    res.status(200).json({
+      status: 'success',
+      commentList: updatedCommentList,
+      totalPageNum,
+    });
   } catch (err) {
     res.status(400).json({ status: 'failed', error: err.message });
   }
