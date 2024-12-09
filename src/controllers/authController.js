@@ -161,6 +161,14 @@ export const resetPassword = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: 'User not exists!' });
     }
+
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
+      return res
+        .status(400)
+        .json({ message: 'You need to use a different password.' });
+    }
+
     const secret = SECRET_KEY + user.password;
 
     const verify = jwt.verify(token, secret);
