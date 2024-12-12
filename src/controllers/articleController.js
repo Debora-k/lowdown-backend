@@ -5,8 +5,11 @@ const articleController = {};
 
 articleController.getArticles = async (req, res) => {
   try {
-    const { page, category } = req.query;
+    const { page, category, searchTitle } = req.query;
     const condition = category ? { category } : {};
+    if (searchTitle) {
+      condition.title = { $regex: searchTitle, $options: 'i' };
+    }
     let query = Article.find(condition).sort({ publishedAt: -1 });
     let response = { status: 'success' };
 
